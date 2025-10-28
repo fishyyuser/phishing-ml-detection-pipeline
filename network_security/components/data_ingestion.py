@@ -1,5 +1,5 @@
 from network_security.exception import NetworkSecurityException
-from network_security.logging import logger
+from network_security.logging.logger import logging
 
 import os
 import sys
@@ -65,19 +65,19 @@ class DataIngestion:
     def split_data_as_train_test(self,dataframe:pd.DataFrame):
         try:
             train_set,test_set=train_test_split(dataframe,test_size=self.data_ingestion_config.train_test_split_ratio)
-            logger.info("Performed the train test split on the dataframe")
-            logger.info("Initiating exporting protocols")
+            logging.info("Performed the train test split on the dataframe")
+            logging.info("Initiating exporting protocols")
 
             dir_path=os.path.dirname(self.data_ingestion_config.training_file_path)
             os.makedirs(dir_path,exist_ok=True)
 
             # exporting traning set
             train_set.to_csv(self.data_ingestion_config.training_file_path,index=False,header=True)
-            logger.info(f"Exported training set to {self.data_ingestion_config.training_file_path}")
+            logging.info(f"Exported training set to {self.data_ingestion_config.training_file_path}")
 
             # exporting test set
             test_set.to_csv(self.data_ingestion_config.testing_file_path,index=False,header=True)
-            logger.info(f"Exported testing set to {self.data_ingestion_config.testing_file_path}")
+            logging.info(f"Exported testing set to {self.data_ingestion_config.testing_file_path}")
 
         except Exception as e:
             raise NetworkSecurityException(e,sys)

@@ -1,5 +1,5 @@
 import sys
-from network_security.logging import logger
+from network_security.logging.logger import logging
 
 class NetworkSecurityException(Exception):
     def __init__(self, error_message, error_detail: sys):
@@ -14,7 +14,7 @@ class NetworkSecurityException(Exception):
             self.lineno = None
             self.file_name = None
 
-        logger.error(self.__str__())
+        logging.error(self.__str__())
 
     def __str__(self):
         if self.lineno and self.file_name:

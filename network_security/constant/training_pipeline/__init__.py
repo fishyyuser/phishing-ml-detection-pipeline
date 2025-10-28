@@ -4,7 +4,17 @@ import numpy as np
 import pandas as pd
 
 """
-Data Ingestion related content
+defining common constant variable for training pipeline
+"""
+TARGET_COLUMN:str="Result"
+PIPELINE_NAME:str="Network_Security_Pipeline"
+ARTIFACT_DIR:str="Artifacts"
+FILE_NAME:str="raw.csv"
+TRAIN_FILE_NAME:str="train.csv"
+TEST_FILE_NAME:str="test.csv"
+
+"""
+Data Ingestion related constants
 """
 DATA_INGESTION_COLLECTION_NAME:str="Network_Data"
 DATA_INGESTION_DATABASE_NAME:str="pradyumn"
@@ -14,11 +24,10 @@ DATA_INGESTION_INGESTED_DIR:str="ingested"
 DATA_INGESTION_TRAIN_TEST_SPLIT_RATIO:float=0.2
 
 """
-defining common constant variable for training pipeline
+Data Validation related constants
 """
-TARGET_COLUMN:str="Result"
-PIPELINE_NAME:str="Network_Security_Pipeline"
-ARTIFACT_DIR:str="Artifacts"
-FILE_NAME:str="raw.csv"
-TRAIN_FILE_NAME:str="train.csv"
-TEST_FILE_NAME:str="test.csv"
+DATA_VALIDATION_DIR_NAME:str="data_validation"
+DATA_VALIDATION_VALID_DIR:str="validated"
+DATA_VALIDATION_INVALID_DIR:str="invalid"
+DATA_VALIDATION_DRIFT_REPORT:str="drift_report"
+DATA_VALIDATION_DRIFT_REPORT_FILE_NAME:str="report.yaml"

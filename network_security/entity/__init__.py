@@ -1,2 +1,0 @@
-from .config_entity import DataIngestionConfig,TrainingPipelineConfig
-from .artifact_entity import DataIngestionArtifact

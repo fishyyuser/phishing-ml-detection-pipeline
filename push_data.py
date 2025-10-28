@@ -3,7 +3,7 @@ import sys
 import json
 
 from network_security.exception import NetworkSecurityException
-from network_security.logging import logger
+from network_security.logging.logger import logging
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -27,9 +27,9 @@ class NetworkDataExtract():
     
     def csv_to_json(self, file_path):
         try:
-            logger.info(f"Reading CSV file from: {file_path}")
+            logging.info(f"Reading CSV file from: {file_path}")
             data = pd.read_csv(file_path, index_col=False)
-            logger.info(f"CSV file read successfully with {data.shape[0]} rows and {data.shape[1]} columns")
+            logging.info(f"CSV file read successfully with {data.shape[0]} rows and {data.shape[1]} columns")
             records = json.loads(data.to_json(orient="records"))
             return records
         except Exception as e:
@@ -42,7 +42,7 @@ class NetworkDataExtract():
                 db = client[database]
                 col = db[collection]
                 result = col.insert_many(records)
-                logger.info(f"Inserted {len(result.inserted_ids)} records into {database}.{collection}")
+                logging.info(f"Inserted {len(result.inserted_ids)} records into {database}.{collection}")
                 return len(result.inserted_ids)
         except Exception as e:
             raise NetworkSecurityException(e, sys)
