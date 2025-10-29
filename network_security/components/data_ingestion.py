@@ -25,7 +25,7 @@ class DataIngestion:
         try:
             self.data_ingestion_config=data_ingestion_config
         except Exception as e:
-            raise NetworkSecurityException(e,sys)
+            raise NetworkSecurityException(e,sys) from None
 
     def export_collection_as_dataframe(self):
         """
@@ -47,7 +47,7 @@ class DataIngestion:
             return df
 
         except Exception as e:
-            raise NetworkSecurityException(e,sys)
+            raise NetworkSecurityException(e,sys) from None
     
     def export_data_to_feature_store(self,dataframe:pd.DataFrame):
 
@@ -60,7 +60,7 @@ class DataIngestion:
             return dataframe
 
         except Exception as e:
-            raise NetworkSecurityException(e,sys)
+            raise NetworkSecurityException(e,sys) from None
         
     def split_data_as_train_test(self,dataframe:pd.DataFrame):
         try:
@@ -80,7 +80,7 @@ class DataIngestion:
             logging.info(f"Exported testing set to {self.data_ingestion_config.testing_file_path}")
 
         except Exception as e:
-            raise NetworkSecurityException(e,sys)
+            raise NetworkSecurityException(e,sys) from None
 
     
     def initiate_data_ingestion(self):
@@ -94,5 +94,5 @@ class DataIngestion:
             )
             return data_ingestion_artifact
         except Exception as e:
-            raise NetworkSecurityException(e,sys)
+            raise NetworkSecurityException(e,sys) from None
     
