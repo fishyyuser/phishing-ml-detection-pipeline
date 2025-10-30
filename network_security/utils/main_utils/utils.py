@@ -7,6 +7,9 @@ from network_security.logging.logger import logging
 import numpy as np
 import dill
 
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import r2_score
+
 def read_yaml_file(file_path:str)->dict:
     try:
         with open(file_path,'rb')as yaml_file:
@@ -109,7 +112,7 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, param):
             report[model_name] = {
                 "train_r2": train_r2,
                 "test_r2": test_r2,
-                "best_params": gs.best_params_
+                "best_model":best_model
             }
 
         return report

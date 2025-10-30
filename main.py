@@ -12,6 +12,9 @@ from network_security.entity.config_entity import DataValidationConfig
 from network_security.components.data_transformation import DataTransformation
 from network_security.entity.config_entity import DataTransformationConfig
 
+from network_security.components.model_trainer import ModelTrainer
+from network_security.entity.config_entity import ModelTrainerConfig
+
 
 
 if __name__=="__main__":
@@ -36,7 +39,7 @@ if __name__=="__main__":
 
         print("=="*45)
         print(data_validation_artifact)
-        
+
 
         logging.info("Initiated the Data Transformation")
         data_transformation_config=DataTransformationConfig(training_pipeline_config)
@@ -48,6 +51,14 @@ if __name__=="__main__":
         print(data_transformation_artifact)
 
 
+        logging.info("Initiated the Model Trainer")
+        model_trainer_config=ModelTrainerConfig(training_pipeline_config)
+        model_trainer=ModelTrainer(data_transformation_artifact=data_transformation_artifact,model_trainer_config=model_trainer_config)
+        model_trainer_artifact=model_trainer.initiate_model_trainer()
+        logging.info("Model Trainer Completed")
+
+        print("=="*45)
+        print(model_trainer_artifact)
 
     except Exception as e:
         raise NetworkSecurityException(e,sys) from None
