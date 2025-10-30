@@ -42,7 +42,7 @@ DATA_TRANSFORMATION_TRANSFORMED_OBJECT_DIR:str="tranformed_object"
 # KNN imputer used in data tranformation to replace nan values
 DATA_TRANSFORMATION_IMPUTER_PARAMS:dict={
     "missing_values":np.nan,
-    "n_neighbours":3,
+    "n_neighbors":3,
     "weights":"uniform"
 }
 DATA_TRANSFORMATION_TRAIN_FILE_PATH: str = "train.npy"
