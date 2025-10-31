@@ -15,7 +15,8 @@ from network_security.entity.config_entity import DataTransformationConfig
 from network_security.components.model_trainer import ModelTrainer
 from network_security.entity.config_entity import ModelTrainerConfig
 
-
+import warnings
+warnings.filterwarnings("ignore")
 
 if __name__=="__main__":
     try:

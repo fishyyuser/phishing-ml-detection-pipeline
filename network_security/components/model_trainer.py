@@ -20,6 +20,19 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier,GradientBoostingClassifier,RandomForestClassifier
 
+import mlflow
+from mlflow.models.signature import infer_signature
+from urllib.parse import urlparse
+
+from dotenv import load_dotenv
+load_dotenv()
+
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
+os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
+os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
+
+mlflow.set_experiment("network_security_project")
+
 class ModelTrainer:
     def __init__(self,model_trainer_config:ModelTrainerConfig,data_transformation_artifact:DataTransformationArtifact):
         try:
@@ -28,12 +41,76 @@ class ModelTrainer:
         except Exception as e:
             raise NetworkSecurityException(e,sys) from None
     
+    def track_mlflow(self, best_model, train_metric, test_metric, X_sample, preprocessor):
+        """
+        Logs train/test metrics and the *wrapped* model (preprocessor+estimator)
+        in a single MLflow run. Uses a stable registered_model_name so registry
+        entries are consistent.
+        """
+
+        # prefer to set registry URI once globally (but safe to set here)
+        mlflow.set_registry_uri(os.getenv("MLFLOW_TRACKING_URI"))
+        tracking_scheme = urlparse(mlflow.get_tracking_uri()).scheme
+
+        # wrap model so preprocessing is included for inference
+        wrapper_model = NetworkModel(preprocessor=preprocessor, model=best_model)
+
+        # small input example (DataFrame) -- don't send huge arrays
+        if isinstance(X_sample, pd.DataFrame):
+            input_example = X_sample.head(5)
+        else:
+            input_example = pd.DataFrame(X_sample).head(5)
+
+        # infer signature using the wrapped model (ensures signature matches logged object)
+        try:
+            signature = infer_signature(input_example, wrapper_model.predict(input_example))
+        except Exception:
+            # fallback: infer signature from input only (no outputs) to avoid hard failure
+            signature = None
+
+        with mlflow.start_run(run_name=f"train_{type(best_model).__name__}"):
+            # tags/params
+            mlflow.set_tag("model_name", type(best_model).__name__)
+            mlflow.log_params(best_model.get_params())
+
+            # train metrics
+            mlflow.log_metric("train_f1_score", train_metric.f1_score)
+            mlflow.log_metric("train_precision_score", train_metric.precision_score)
+            mlflow.log_metric("train_recall_score", train_metric.recall_score)
+
+            # test metrics
+            mlflow.log_metric("test_f1_score", test_metric.f1_score)
+            mlflow.log_metric("test_precision_score", test_metric.precision_score)
+            mlflow.log_metric("test_recall_score", test_metric.recall_score)
+
+            # log the wrapper model
+            registered_name = os.getenv("MLFLOW_REGISTERED_MODEL_NAME", "network_security_model")
+
+            if tracking_scheme != "file":
+                # logs + registers
+                mlflow.sklearn.log_model(
+                    sk_model=wrapper_model,
+                    artifact_path="model",
+                    signature=signature,
+                    input_example=input_example,
+                    registered_model_name=registered_name,
+                )
+            else:
+                # file store: cannot register but can log artifact
+                mlflow.sklearn.log_model(
+                    sk_model=wrapper_model,
+                    artifact_path="model",
+                    signature=signature,
+                    input_example=input_example,
+                )
+
+    
     def train_model(self,X_train,y_train,X_test,y_test):
         models = {
-            "Random Forest": RandomForestClassifier(verbose=1),
+            "Random Forest": RandomForestClassifier(),
             "Decision Tree": DecisionTreeClassifier(),
-            "Gradient Boosting": GradientBoostingClassifier(verbose=1),
-            "Logistic Regression": LogisticRegression(verbose=1),
+            "Gradient Boosting": GradientBoostingClassifier(),
+            "Logistic Regression": LogisticRegression(max_iter=500, solver="lbfgs"),
             "AdaBoost": AdaBoostClassifier()
         }
         params={
@@ -68,20 +145,16 @@ class ModelTrainer:
                                         models=models,param=params)
         
         # To get the best model score
-        best_model_name = max(model_report, key=lambda model_name: model_report[model_name]["test_r2"])
-        best_model_score = model_report[best_model_name]["test_r2"]
+        best_model_name = max(model_report, key=lambda model_name: model_report[model_name]["test_f1"])
+        best_model_score = model_report[best_model_name]["test_f1"]
 
         best_model=model_report[best_model_name]["best_model"]
 
         y_train_pred=best_model.predict(X_train)
         classification_train_metric=get_classification_score(y_true=y_train,y_pred=y_train_pred)
-        ## Track the experiements with mlflow
-
 
         y_test_pred=best_model.predict(X_test)
-        classification_test_metric=get_classification_score(y_true=y_test,y_pred=y_test_pred)
-        ## Track the experiements with mlflow
-
+        classification_test_metric=get_classification_score(y_true=y_test,y_pred=y_test_pred)     
 
         preprocessor = load_object(file_path=self.data_transformation_artifact.transformed_object_file_path)
         model_dir_path= os.path.dirname(self.model_trainer_config.trained_model_file_path)
@@ -90,9 +163,12 @@ class ModelTrainer:
         network_model=NetworkModel(preprocessor=preprocessor,model=best_model)
         save_object(self.model_trainer_config.trained_model_file_path,obj=network_model)
 
+        ## Track the experiements with mlflow
+        self.track_mlflow(best_model,classification_train_metric,classification_test_metric,pd.DataFrame(X_train[:5]),preprocessor)
+
         # model pusher
         save_file_path=os.path.join("final_model","model.pkl")
-        save_object(save_file_path,best_model)
+        save_object(save_file_path, network_model)
 
         # Model Trainer Artifact
         model_trainer_artifact=ModelTrainerArtifact(

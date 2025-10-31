@@ -8,7 +8,7 @@ import numpy as np
 import dill
 
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import r2_score
+from sklearn.metrics import f1_score
 
 def read_yaml_file(file_path:str)->dict:
     try:
@@ -102,16 +102,16 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, param):
             y_train_pred = best_model.predict(X_train)
             y_test_pred = best_model.predict(X_test)
 
-            train_r2 = r2_score(y_train, y_train_pred)
-            test_r2 = r2_score(y_test, y_test_pred)
+            train_f1 = f1_score(y_train, y_train_pred)
+            test_f1 = f1_score(y_test, y_test_pred)
 
             logging.info(
-                f"{model_name}: train_r2={train_r2:.3f}, test_r2={test_r2:.3f}, best_params={gs.best_params_}"
+                f"{model_name}: train_f1={train_f1:.3f}, test_f1={test_f1:.3f}, best_params={gs.best_params_}"
             )
 
             report[model_name] = {
-                "train_r2": train_r2,
-                "test_r2": test_r2,
+                "train_f1": train_f1,
+                "test_f1": test_f1,
                 "best_model":best_model
             }
 
