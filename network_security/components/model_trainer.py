@@ -166,7 +166,7 @@ class ModelTrainer:
         ## Track the experiements with mlflow
         self.track_mlflow(best_model,classification_train_metric,classification_test_metric,pd.DataFrame(X_train[:5]),preprocessor)
 
-        # model pusher
+        # model pusher(this could be local or cloud platforms)
         save_file_path=os.path.join("final_model","model.pkl")
         save_object(save_file_path, network_model)
 
