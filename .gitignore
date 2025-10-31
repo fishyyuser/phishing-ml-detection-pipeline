@@ -150,6 +150,7 @@ activemq-data/
 # Environments
 Artifacts
 final_model
+mlruns
 .env
 .envrc
 .venv
