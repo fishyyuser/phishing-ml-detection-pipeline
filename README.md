@@ -13,7 +13,7 @@ The design emphasizes:
 
 This mirrors real-world ML engineering standards: modular, testable, maintainable, and deployment-ready.
 
----
+
 
 ## Problem Statement
 
@@ -25,7 +25,7 @@ Raw labeled URLs pass through a multi-stage training pipeline, and the deployed 
 
 Consistent preprocessing ensures training-serving parity.
 
----
+
 
 ## Model Summary
 
@@ -38,7 +38,7 @@ Consistent preprocessing ensures training-serving parity.
 
 All metrics and artifacts are tracked using **MLflow**.
 
----
+
 
 ## API Inputs
 
@@ -51,7 +51,7 @@ The service returns:
 
 A simple web UI (Jinja templates) supports single URL input and batch CSV prediction.
 
----
+
 
 # Architecture Overview
 ```bash
@@ -75,7 +75,7 @@ Docker Deployment
 - Production-grade logging + error handling
 - Lightweight Dockerized inference environment
 
----
+
 
 # Training Pipeline Components
 
@@ -99,7 +99,7 @@ Docker Deployment
 
 Artifacts are stored in a versioned structure inside `Artifacts/`.
 
----
+
 
 # Deployment
 
@@ -118,7 +118,7 @@ Supports:
 - JSON API predictions
 - CSV batch predictions
 
----
+
 
 ## Docker Deployment
 
@@ -159,7 +159,7 @@ Visit:
 http://<public-ip>:8000
 ```
 
----
+
 
 ## Tech Stack
 
@@ -185,7 +185,7 @@ http://<public-ip>:8000
 - Docker
 - Optional MongoDB logging
 
----
+
 
 ## License
 
