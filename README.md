@@ -187,21 +187,6 @@ http://<public-ip>:8000
 
 ---
 
-## What This Project Demonstrates
-
-- Real ML engineering pipeline structure
-- Reproducible end-to-end training workflow
-- MLflow experiment tracking
-- Schema-based validation
-- Clean decoupling of training / deployment
-- FastAPI model serving
-- Dockerized inference
-- Batch prediction pipeline
-- Robust logging & exception handling
-
-These skills are essential for **ML Engineer**, **AI Engineer**, and **MLOps** roles.
----
-
 ## License
 
 MIT
